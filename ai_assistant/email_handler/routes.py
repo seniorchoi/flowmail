@@ -19,10 +19,15 @@ def receive_email():
     """
     Endpoint to receive emails forwarded by Mailgun.
     """
+    # Log incoming data
+    logger.info(f"Received webhook data: {request.form}")
+
     # Verify the request came from Mailgun
     token = request.form.get('token')
     timestamp = request.form.get('timestamp')
     signature = request.form.get('signature')
+
+    logger.info(f"Token: {token}, Timestamp: {timestamp}, Signature: {signature}")
 
     if not verify_mailgun_request(token, timestamp, signature):
         logger.error('Invalid Mailgun request signature.')

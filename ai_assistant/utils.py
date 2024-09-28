@@ -4,10 +4,13 @@ import requests
 import re
 import hmac
 import hashlib
-import openai
+from openai import OpenAI
 import logging
+import time
 from .config import Config
 
+
+client = OpenAI(api_key=Config.OPENAI_API_KEY)
 logger = logging.getLogger(__name__)
 
 def send_email(to_email, subject, text_content, html_content=None):
@@ -48,22 +51,39 @@ def extract_user_identifier(recipient_address):
         return None
 
 def verify_mailgun_request(token, timestamp, signature):
-    api_key = Config.MAILGUN_API_KEY
-    if not api_key:
+    signing_key = Config.MAILGUN_WEBHOOK_SIGNING_KEY
+    if not signing_key:
         return False
+
+    # Prepare the data to be hashed
+    data = f'{timestamp}{token}'.encode('utf-8')
+
+    # Check if the timestamp is within 5 minutes
+    if abs(time.time() - float(timestamp)) > 300:
+        logger.error("Timestamp is too old or too far in the future.")
+        return False
+
     hmac_digest = hmac.new(
-        key=api_key.encode('utf-8'),
+        key=signing_key.encode('utf-8'),
         msg=f'{timestamp}{token}'.encode('utf-8'),
         digestmod=hashlib.sha256
     ).hexdigest()
-    return hmac.compare_digest(hmac_digest, signature)
+
+    logger.info(f"Computed HMAC digest: {hmac_digest}")
+    logger.info(f"Received signature: {signature}")
+
+    is_valid = hmac.compare_digest(hmac_digest, signature)
+    logger.info(f"Signature valid: {is_valid}")
+    return is_valid
+
+
+#OPEN AI
 
 def process_email_with_ai(email_content):
-    openai.api_key = Config.OPENAI_API_KEY
-    response = openai.Completion.create(
-        engine='text-davinci-003',
-        prompt=email_content,
-        max_tokens=150,
-        temperature=0.7
-    )
-    return response.choices[0].text.strip()
+    response = client.chat.completions.create(model='gpt-4o-mini',  # or 'gpt-4' if you have access
+    messages=[
+        {"role": "user", "content": email_content}
+    ],
+    max_tokens=150,
+    temperature=0.7)
+    return response.choices[0].message.content.strip()
