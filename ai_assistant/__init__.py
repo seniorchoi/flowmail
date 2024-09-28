@@ -8,6 +8,8 @@ from .main.routes import main_bp
 from .email_handler.routes import email_handler
 from .models import User
 
+#import logging
+#logging.basicConfig(level=logging.INFO)
 
 def create_app(config_class=None):
     app = Flask(__name__)

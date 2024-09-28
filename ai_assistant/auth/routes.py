@@ -18,6 +18,7 @@ def register():
         new_user = User(
             email=form.email.data,
             username=form.username.data,
+            name=form.name.data,
             password=hashed_password
         )
         db.session.add(new_user)
