@@ -7,6 +7,7 @@ from .auth.routes import auth_bp
 from .main.routes import main_bp
 from .email_handler.routes import email_handler
 from .models import User
+import logging
 
 #import logging
 #logging.basicConfig(level=logging.INFO)
@@ -22,8 +23,9 @@ def create_app(config_class=None):
         else:
             config_class = DevelopmentConfig
     app.config.from_object(config_class)
-    
+
     # Add logging
+    logger = logging.getLogger(__name__)
     logging.basicConfig(level=logging.INFO)
     app.logger.info(f"Using configuration: {config_class.__name__}")
     app.logger.info(f"SQLALCHEMY_DATABASE_URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
