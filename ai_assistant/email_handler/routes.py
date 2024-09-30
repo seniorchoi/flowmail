@@ -82,7 +82,8 @@ def receive_email():
         #logger.info(f"User found: {user}")
 
         # Find the owner of the AI assistant email (User 1)
-        owner_user = User.query.filter_by(username=user_identifier).first()
+        #owner_user = User.query.filter_by(username=user_identifier).first()
+        owner_user = db.session.query(User).filter_by(username=user_identifier).first()
         logger.info(f"Owner user found: {owner_user}")
 
         if not owner_user:
