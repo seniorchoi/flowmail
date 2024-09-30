@@ -29,16 +29,17 @@ def create_app(config_class=None):
     logging.basicConfig(level=logging.INFO)
     app.logger.info(f"Using configuration: {config_class.__name__}")
     app.logger.info(f"SQLALCHEMY_DATABASE_URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
-   
+
+    # Register blueprints **before** initializing extensions
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(main_bp)
+    app.register_blueprint(email_handler, url_prefix='/email')   
 
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
 
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(main_bp)
-    app.register_blueprint(email_handler, url_prefix='/email')
 
     # Configure login manager
     login_manager.login_view = 'auth.login'
