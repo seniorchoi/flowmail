@@ -19,7 +19,7 @@ email_handler_bp = Blueprint('email_handler', __name__)
 # Configure logger
 logger = logging.getLogger(__name__)
 
-@email_handler.route('/receive', methods=['POST'])
+@email_handler_bp.route('/receive', methods=['POST'])
 def receive_email():
     try:
         """
