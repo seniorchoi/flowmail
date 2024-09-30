@@ -1,6 +1,6 @@
 # ai_assistant/email_handler/routes.py
-from flask import request, abort, current_app
-from . import email_handler  # Import the existing blueprint
+from flask import request, abort, current_app, Blueprint
+#from . import email_handler  # Import the existing blueprint
 from ..extensions import db
 from ..models import User
 from ..utils import (
@@ -13,6 +13,8 @@ from ..utils import (
 from ..config import Config
 import logging
 import traceback
+
+email_handler_bp = Blueprint('email_handler', __name__)
 
 # Configure logger
 logger = logging.getLogger(__name__)
