@@ -5,7 +5,7 @@ from .extensions import db, migrate, login_manager
 from .config import DevelopmentConfig, ProductionConfig
 from .auth.routes import auth_bp
 from .main.routes import main_bp
-from .email_handler.routes import email_handler
+from .email_handler.routes import email_handler_bp
 from .models import User
 import logging
 
@@ -33,7 +33,7 @@ def create_app(config_class=None):
     # Register blueprints **before** initializing extensions
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
-    app.register_blueprint(email_handler, url_prefix='/email')   
+    app.register_blueprint(email_handler_bp, url_prefix='/email')   
 
     # Initialize extensions
     db.init_app(app)

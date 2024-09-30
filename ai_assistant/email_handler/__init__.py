@@ -1,5 +1,5 @@
-from flask import Blueprint
+#from flask import Blueprint
 
-email_handler = Blueprint('email_handler', __name__)
+#email_handler = Blueprint('email_handler', __name__)
 
-from . import routes  # Import routes to register them with the blueprint
+#from . import routes  # Import routes to register them with the blueprint
