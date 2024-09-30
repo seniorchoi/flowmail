@@ -19,7 +19,9 @@ class DevelopmentConfig(Config):
     DEBUG = True
 
 class ProductionConfig(Config):
-    database_url = os.environ.get('DATABASE_URL', '')
+    database_url = os.environ.get('DATABASE_URL')
+    if not database_url:
+        raise ValueError("No DATABASE_URL environment variable set for production")
     if database_url.startswith('postgres://'):
         database_url = database_url.replace('postgres://', 'postgresql://', 1)
     SQLALCHEMY_DATABASE_URI = database_url

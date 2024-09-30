@@ -22,6 +22,12 @@ def create_app(config_class=None):
         else:
             config_class = DevelopmentConfig
     app.config.from_object(config_class)
+    
+    # Add logging
+    logging.basicConfig(level=logging.INFO)
+    app.logger.info(f"Using configuration: {config_class.__name__}")
+    app.logger.info(f"SQLALCHEMY_DATABASE_URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
+   
 
     # Initialize extensions
     db.init_app(app)
