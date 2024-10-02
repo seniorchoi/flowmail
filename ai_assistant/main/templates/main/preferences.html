@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Preferences{% endblock %}
+
+{% block content %}
+<h2>Update Your Preferences</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.role.label }}<br>
+        {{ form.role(size=50) }}
+        {% for error in form.role.errors %}
+            <span class="error">{{ error }}</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.assistant_personality.label }}<br>
+        {{ form.assistant_personality(rows=3, cols=50, placeholder="ex) friendly, professional, sarcastic") }}
+        {% for error in form.assistant_personality.errors %}
+            <span class="error">{{ error }}</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.about_me.label }}<br>
+        {{ form.about_me(rows=3, cols=50, placeholder="ex) 20 years old, single, enjoys hiking") }}
+        {% for error in form.about_me.errors %}
+            <span class="error">{{ error }}</span>
+        {% endfor %}
+    </p>
+    <p>{{ form.submit(class="btn") }}</p>
+</form>
+{% endblock %}

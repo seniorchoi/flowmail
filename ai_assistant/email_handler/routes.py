@@ -49,6 +49,7 @@ def receive_email():
     recipient = request.form.get('recipient', '').strip().lower()  # The To address
     subject = request.form.get('subject', '')
     body_plain = request.form.get('body-plain', '')
+    logger.info(f"subject:{subject},body: {body_plain}")
 
     # Check if the sender is the AI assistant's own email address
     #ai_email_address = f"assistant.{user_identifier}@{Config.MAILGUN_DOMAIN}".lower()
@@ -159,7 +160,7 @@ def receive_email():
     # Construct the email content including the original message
     user_name = owner_user.name if owner_user.name else owner_user.username
     user_email = owner_user.email
-    greeting = f"Hi, this is {user_name}'s AI assistant."
+    greeting = f"This is {user_name}'s AI assistant."
     
     # Log who to whom email was sent from
     logger.info(f"Received email from: {sender} to: {recipient}")
@@ -184,6 +185,7 @@ def receive_email():
     email_content = greeting + ai_response_formatted + original_message + footer
 
     # Send the AI-generated response
+    assistant_name = f"{owner_user.name}'s AI Assistant"
     from_email = ai_email_address
     reply_to_email = from_email  # Replies should go back to the AI assistant
     email_subject = subject if subject.startswith("Re:") else f"Re: {subject}"

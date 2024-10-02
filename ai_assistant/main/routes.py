@@ -1,8 +1,10 @@
 # ai_assistant/main/routes.py
-from flask import Blueprint, render_template, redirect, url_for, flash, current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, current_app, request
 from flask_login import login_required, current_user
 from ..utils import send_email
 from ..config import Config
+from .forms import PreferencesForm
+from ..extensions import db
 
 main_bp = Blueprint('main', __name__, template_folder='templates')
 
@@ -31,3 +33,20 @@ def send_test_email():
     else:
         flash('Failed to send test email.', 'danger')
     return redirect(url_for('main.dashboard'))
+
+@main_bp.route('/preferences', methods=['GET', 'POST'])
+@login_required
+def preferences():
+    form = PreferencesForm()
+    if form.validate_on_submit():
+        current_user.role = form.role.data
+        current_user.assistant_personality = form.assistant_personality.data
+        current_user.about_me = form.about_me.data
+        db.session.commit()
+        flash('Your preferences have been updated.', 'success')
+        return redirect(url_for('main.dashboard'))
+    elif request.method == 'GET':
+        form.role.data = current_user.role
+        form.assistant_personality.data = current_user.assistant_personality
+        form.about_me.data = current_user.about_me
+    return render_template('main/preferences.html', form=form)

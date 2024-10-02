@@ -6,7 +6,9 @@
 <h2>Welcome, {{ current_user.name }}!</h2>
 <p>Your AI Assistant email address is: {{ assistant_email }}</p>
 
-<p>This is your dashboard.</p>
+<!-- In ai_assistant/main/templates/main/dashboard.html 
 <p><a href="{{ url_for('main.send_test_email') }}">Send Test Email</a></p>
+-->
+<p><a href="{{ url_for('main.preferences') }}">Update Preferences</a></p>
 <p><a href="{{ url_for('auth.logout') }}">Logout</a></p>
 {% endblock %}

@@ -6,7 +6,7 @@ from openai import OpenAI
 import logging
 import time
 from .config import Config
-
+import json
 
 client = OpenAI(api_key=Config.OPENAI_API_KEY)
 logger = logging.getLogger(__name__)
@@ -104,6 +104,7 @@ def verify_mailgun_request(token, timestamp, signature):
 
 
 #OPEN AI
+"""
 def process_email_with_ai(email_subject, email_content, user=None):
     messages = []
 
@@ -113,24 +114,6 @@ def process_email_with_ai(email_subject, email_content, user=None):
 
     combined_content = f"Subject: {email_subject}\n\n{email_content}" if email_subject else email_content
     messages.append({"role": "user", "content": combined_content})
-
-    """
-    # Include the subject in the message
-    if email_subject:
-        combined_content = f"Subject: {email_subject}\n\n{email_content}"
-    else:
-        combined_content = email_content
-
-    messages.append({"role": "user", "content": combined_content})
-
-    response = client.chat.completions.create(
-        model='gpt-4o-mini',  # or 'gpt-4' if you have access
-        messages=messages,
-        max_tokens=300,
-        temperature=0.7,
-    )
-    return response.choices[0].message.content.strip()
-    """
     
     try:
         response = client.chat.completions.create(
@@ -141,6 +124,83 @@ def process_email_with_ai(email_subject, email_content, user=None):
         )
         return response.choices[0].message.content.strip()
 
+    except Exception as e:
+        logger.error(f"OpenAI API error: {e}")
+        return "I'm sorry, but I couldn't process your request at this time."
+"""
+
+def process_email_with_ai(email_subject, email_content, user=None):
+    """
+    Process the email content with OpenAI's ChatCompletion API, including user context.
+    """
+    if not user:
+        # Handle the case where user is None
+        user_name = "User"
+        user_role = ""
+        assistant_personality = ""
+        about_me = ""
+    else:
+        user_name = user.name
+        user_role = user.role or ""
+        assistant_personality = user.assistant_personality or ""
+        about_me = user.about_me or ""
+    
+    # Prepare the assistant personality traits
+    #personality_traits = assistant_personality.split(',') if assistant_personality else []
+    personality_traits = [trait.strip() for trait in assistant_personality.split(',')] if assistant_personality else []
+    personality_description = ', '.join([trait.strip() for trait in personality_traits])
+
+    # Prepare the 'about me' information
+    #about_me_info = about_me.split(',') if about_me else []
+    about_me_info = [info.strip() for info in about_me.split(',')] if about_me else []
+    about_me_description = '. '.join([info.strip() for info in about_me_info])
+
+    # Construct the detailed prompt
+    prompt = (
+        f"You are {user_name}'s personal AI assistant. "
+        f"{f'{user_name} is a {user_role}. ' if user_role else ''}"
+        f"Your personality traits are: {personality_description}. "
+        f"{f'{user_name} is {about_me_description}.' if about_me_description else ''} "
+        f"Your task is to read the following email sent to {user_name} and write a response as {user_name}'s assistant. "
+        f"The response should have a {personality_description} tone. "
+        #f"\n\nEmail Subject:\n{email_subject}\n\n" if email_subject else ""
+        f"Email Content:\n{email_content}\n\n"
+        f"Do not include any placeholders."
+    )
+
+    messages = [
+        {"role": "system", "content": "You are a helpful AI assistant."},
+        {"role": "user", "content": prompt}
+    ]
+
+    """
+    # Construct the detailed prompt
+    prompt = (
+        f"You are the personal AI assistant of {user_name}. "
+        f"{f'They are a {user_role}.' if user_role else ''} "
+        f"Your task is to read the following email and write a response that aligns with {user_name}'s style and preferences.\n\n"
+        "Email Content:\n"
+        f"{email_content}\n\n"
+        f"{user_name}'s Preferences:\n"
+        f"{json.dumps(user_preferences, indent=2)}"
+        f"Do not include any placeholders."
+    )
+
+    messages = [
+        {"role": "system", "content": "You are a helpful AI assistant."},
+        {"role": "user", "content": prompt}
+    ]
+    """
+    try:
+        response = client.chat.completions.create(
+            model='gpt-4o-mini',  # Use a model you have access to
+            messages=messages,
+            max_tokens=300,
+            temperature=0.7,
+        )
+        ai_reply = response.choices[0].message.content.strip()
+        return ai_reply
+        
     except Exception as e:
         logger.error(f"OpenAI API error: {e}")
         return "I'm sorry, but I couldn't process your request at this time."

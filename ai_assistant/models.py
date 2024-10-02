@@ -9,8 +9,13 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(50), unique=True, nullable=False)
     name = db.Column(db.String(128), nullable=False, default='Default Name')
     password = db.Column(db.String(512), nullable=False)
-    role = db.Column(db.String(128), nullable=True)  # New field for user's role
-    preferences = db.Column(db.Text, nullable=True)  # New field for user's preferences
+    role = db.Column(db.String(128), nullable=True)  # Job Title
+    
+    # New preference fields
+    assistant_personality = db.Column(db.String(256), nullable=True)  # Comma-separated personality traits
+    about_me = db.Column(db.Text, nullable=True)  # Comma-separated about me details
+    
+    
 
 
     def __repr__(self):
