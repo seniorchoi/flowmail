@@ -9,6 +9,9 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(50), unique=True, nullable=False)
     name = db.Column(db.String(128), nullable=False, default='Default Name')
     password = db.Column(db.String(512), nullable=False)
+    role = db.Column(db.String(128), nullable=True)  # New field for user's role
+    preferences = db.Column(db.Text, nullable=True)  # New field for user's preferences
+
 
     def __repr__(self):
         return f'<User {self.email}>'
