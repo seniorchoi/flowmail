@@ -6,8 +6,13 @@ from ..config import Config
 from .forms import PreferencesForm
 from ..extensions import db
 from functools import wraps
+from ..extensions import csrf
+import logging
+import json
 
 main_bp = Blueprint('main', __name__, template_folder='templates')
+
+logger = logging.getLogger(__name__)
 
 # Set the Stripe API key
 stripe.api_key = Config.STRIPE_SECRET_KEY
@@ -64,22 +69,24 @@ def checkout():
 
 @main_bp.route('/create-checkout-session', methods=['POST'])
 @login_required
+@csrf.exempt  # Exempt this route from CSRF protection
 def create_checkout_session():
     try:
+        current_app.logger.info(f"User authenticated: {current_user.is_authenticated}")
+        data = request.get_json()
+        selected_price_id = data.get('priceId') if data else None
+
+        if not selected_price_id:
+            current_app.logger.error('Price ID not provided.')
+            return jsonify({'error': 'Price ID not provided.'}), 400
+
+        #try:
         checkout_session = stripe.checkout.Session.create(
             customer_email=current_user.email,
             payment_method_types=['card'],
             line_items=[
                 {
-                    'price': 'price_1Q2qsFKjJ23rv2vUvTefj4Sx',  # Replace with your price ID
-                    'quantity': 1,
-                },
-                {
-                    'price': 'price_1Q2qrZKjJ23rv2vUc6hO0tpY',  # Replace with your price ID
-                    'quantity': 1,
-                },
-                {
-                    'price': 'price_1Q2qrFKjJ23rv2vUbICjHRbK',  # Replace with your price ID
+                    'price': selected_price_id,  # Replace with your price ID
                     'quantity': 1,
                 },
             ],

@@ -4,19 +4,27 @@
 
 {% block content %}
 <h2>Subscribe to Premium Plan</h2>
+<label for="subscription-plan">Choose a plan:</label>
+<select id="subscription-plan">
+    <option value="price_1Q2qrZKjJ23rv2vUc6hO0tpY">Monthly - $9.99/month</option>
+    <option value="price_1Q2qrFKjJ23rv2vUbICjHRbK">6 months - $49.99/year</option>
+    <option value="price_1Q2qsFKjJ23rv2vUvTefj4Sx">Yearly - $99.99/year</option>
+</select>
 <button id="checkout-button">Subscribe Now</button>
 
 <script src="https://js.stripe.com/v3/"></script>
 <script>
+    var csrfToken = "{{ csrf_token() }}";
     var stripe = Stripe("{{ stripe_publishable_key }}");
     var checkoutButton = document.getElementById('checkout-button');
     checkoutButton.addEventListener('click', function () {
+        var selectedPrice = document.getElementById('subscription-plan').value;
         fetch("{{ url_for('main.create_checkout_session') }}", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": "{{ csrf_token() }}"
+                "Content-Type": "application/json"
             },
+            body: JSON.stringify({ priceId: selectedPrice })
         })
         .then(function (response) {
             return response.json();

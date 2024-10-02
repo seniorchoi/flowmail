@@ -5,11 +5,9 @@ from flask_wtf._compat import FlaskWTFDeprecationWarning
 class CustomCSRFProtect(CSRFProtect):
     def validate_csrf(self, data=None):
         if data is None:
-            # Try to get the token from the headers
-            data = request.headers.get('X-CSRFToken')
+            data = request.headers.get('X-CSRFToken')  # Get token from header
         if not data:
-            # Try to get from form data as fallback
-            data = request.form.get('csrf_token')
-        validate_csrf(data)
+            data = request.form.get('csrf_token')  # Fallback to form data
+        return super().validate_csrf(data)
 
 csrf = CustomCSRFProtect()

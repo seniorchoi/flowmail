@@ -11,6 +11,8 @@ from .models import User
 import logging
 from logging.handlers import RotatingFileHandler
 from datetime import datetime
+from werkzeug.middleware.proxy_fix import ProxyFix
+
 
 #import logging
 #logging.basicConfig(level=logging.INFO)
@@ -73,5 +75,8 @@ def create_app(config_class=None):
     @app.context_processor
     def inject_current_year():
         return {'current_year': datetime.utcnow().year}
+
+    
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
     return app
