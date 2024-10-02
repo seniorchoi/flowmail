@@ -158,14 +158,14 @@ def process_email_with_ai(email_subject, email_content, user=None):
     # Construct the detailed prompt
     prompt = (
         f"You are {user_name}'s personal AI assistant. "
-        f"{f'{user_name} is a {user_role}. ' if user_role else ''}"
+        f"{f'he/she is a {user_role}. ' if user_role else ''}"
         f"Your personality traits are: {personality_description}. "
         f"{f'{user_name} is {about_me_description}.' if about_me_description else ''} "
         f"Your task is to read the following email sent to {user_name} and write a response as {user_name}'s assistant. "
         f"The response should have a {personality_description} tone. "
+        f"Do not include any placeholders."
         #f"\n\nEmail Subject:\n{email_subject}\n\n" if email_subject else ""
         f"Email Content:\n{email_content}\n\n"
-        f"Do not include any placeholders."
     )
 
     messages = [
