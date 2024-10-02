@@ -1,5 +1,3 @@
-# ai_assistant/utils.py
-import os
 import requests
 import re
 import hmac
@@ -113,6 +111,10 @@ def process_email_with_ai(email_subject, email_content, user=None):
         # Include user-specific context if necessary
         messages.append({"role": "system", "content": f"Assistant for user {user.username}."})
 
+    combined_content = f"Subject: {email_subject}\n\n{email_content}" if email_subject else email_content
+    messages.append({"role": "user", "content": combined_content})
+
+    """
     # Include the subject in the message
     if email_subject:
         combined_content = f"Subject: {email_subject}\n\n{email_content}"
@@ -127,5 +129,18 @@ def process_email_with_ai(email_subject, email_content, user=None):
         max_tokens=300,
         temperature=0.7,
     )
-
     return response.choices[0].message.content.strip()
+    """
+    
+    try:
+        response = client.chat.completions.create(
+            model='gpt-4o-mini',  # Use a model you have access to
+            messages=messages,
+            max_tokens=300,
+            temperature=0.7,
+        )
+        return response.choices[0].message.content.strip()
+
+    except Exception as e:
+        logger.error(f"OpenAI API error: {e}")
+        return "I'm sorry, but I couldn't process your request at this time."
