@@ -1,8 +1,8 @@
 # ai_assistant/email_handler/routes.py
-from flask import request, abort, current_app, Blueprint
+from flask import request, abort, current_app, Blueprint, jsonify
 #from . import email_handler  # Import the existing blueprint
 from sqlalchemy import func
-from ..extensions import db
+from ..extensions import db, csrf
 from ..models import User
 from ..utils import (
     verify_mailgun_request,
@@ -20,6 +20,7 @@ email_handler_bp = Blueprint('email_handler', __name__)
 logger = logging.getLogger(__name__)
 
 @email_handler_bp.route('/receive', methods=['POST'])
+@csrf.exempt  # Exempt this route from CSRF protection
 def receive_email():
 #try:
     """
